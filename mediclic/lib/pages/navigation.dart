@@ -6,7 +6,6 @@ import 'package:mediclic/pages/profil.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
-  // This widget is the root of your application.
   @override
   State<StatefulWidget> createState() {
     return NavigationState();
