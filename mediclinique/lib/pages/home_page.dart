@@ -12,7 +12,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- // final User? user =Auth().currentUser;
+  final User? user =Auth().currentUser;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +24,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-               //   Text(user?.email?? "User email")
+                 Text(user?.email?? "User email"),
+                 
                 ])));
   }
 }
