@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediclic/services/authentification.dart';
+import 'package:mediclic/pages/connexion.dart';
+import 'package:intl/intl.dart';
 
 class Inscription extends StatefulWidget {
   const Inscription({super.key});
@@ -9,186 +11,354 @@ class Inscription extends StatefulWidget {
 }
 
 class _InscriptionState extends State<Inscription> {
-  @override
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController controleur_email = TextEditingController();
   TextEditingController controleur_nom = TextEditingController();
   TextEditingController controleur_prenom = TextEditingController();
   TextEditingController controleur_date = TextEditingController();
-  DateTime? controleur_date_naissance;
+  DateTime? selectedDate;
   TextEditingController controleur_groupe_sanguin = TextEditingController();
   TextEditingController controleur_allergies = TextEditingController();
-
   TextEditingController controleur_password = TextEditingController();
-
-  DateTime? selectedDate;
+  TextEditingController controleur_confirm_password = TextEditingController();
+  bool _obscureTextPassword = true;
+  bool _obscureTextConfirm = true;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1990, 1),
-        lastDate: DateTime.now());
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)), // Défaut à 18 ans
+      firstDate: DateTime(1940, 1),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color(0xFF144DDE),
+            colorScheme: const ColorScheme.light(primary: Color(0xFF144DDE)),
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+          ),
+          child: child!,
+        );
+      },
+    );
+    
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        controleur_date.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
 
-  final String _name = '';
-  String _email = '';
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {}
+    if (_formKey.currentState!.validate()) {
+      // Validation réussie
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     double largeurEcran = MediaQuery.of(context).size.width;
-    double longueurEcran = MediaQuery.of(context).size.height;
+    
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Column(
-          children: [
-            Text(
-              "Inscription",
-              style: TextStyle(color: Colors.black, fontSize: 40),
-            ),
-            Padding(padding: EdgeInsets.only(bottom: 10)),
-            TextFormField(
-              controller: controleur_nom,
-              decoration: InputDecoration(
-                hintText: "Nom",
-                border: OutlineInputBorder(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "Créer un compte",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Champ Nom
+              _buildInputLabel("Nom"),
+              TextFormField(
+                controller: controleur_nom,
+                decoration: _buildInputDecoration("Nom"),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer votre nom';
+                  }
+                  if (!RegExp(r'^[a-zA-ZÀ-ÿ\s]+$').hasMatch(value)) {
+                    return 'Le nom ne doit contenir que des lettres';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              
+              // Champ Prénom
+              _buildInputLabel("Prénoms"),
+              TextFormField(
+                controller: controleur_prenom,
+                decoration: _buildInputDecoration("Prénoms"),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer votre prénom';
+                  }
+                  if (!RegExp(r'^[a-zA-ZÀ-ÿ\s]+$').hasMatch(value)) {
+                    return 'Le prénom ne doit contenir que des lettres';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              
+              // Champ Date de naissance
+              _buildInputLabel("Date de naissance"),
+              TextFormField(
+                controller: controleur_date,
+                readOnly: true,
+                onTap: () => _selectDate(context),
+                decoration: _buildInputDecoration("Date de naissance"),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez sélectionner votre date de naissance';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              
+              // Champ Email
+              _buildInputLabel("Email"),
+              TextFormField(
+                controller: controleur_email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: _buildInputDecoration("Email"),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer votre email';
+                  }
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    return 'Veuillez entrer un email valide';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              
+              // Mot de passe
+              _buildInputLabel("Mot de passe"),
+              TextFormField(
+                controller: controleur_password,
+                obscureText: _obscureTextPassword,
+                decoration: InputDecoration(
+                  hintText: "Mot de passe",
+                  border: OutlineInputBorder(
                     borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureTextPassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureTextPassword = !_obscureTextPassword;
+                      });
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer un mot de passe';
+                  }
+                  if (value.length < 6) {
+                    return 'Le mot de passe doit contenir au moins 6 caractères';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrez votre nom';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: controleur_prenom,
-              decoration: InputDecoration(
-                hintText: "Prénom",
-                border: OutlineInputBorder(
+              const SizedBox(height: 16),
+              
+              // Confirmer mot de passe
+              _buildInputLabel("Confirmer mot de passe"),
+              TextFormField(
+                controller: controleur_confirm_password,
+                obscureText: _obscureTextConfirm,
+                decoration: InputDecoration(
+                  hintText: "Confirmer mot de passe",
+                  border: OutlineInputBorder(
                     borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureTextConfirm ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureTextConfirm = !_obscureTextConfirm;
+                      });
+                    },
+                  ),
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez confirmer votre mot de passe';
+                  }
+                  if (value != controleur_password.text) {
+                    return 'Les mots de passe ne correspondent pas';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrez votre prénom.';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              readOnly: true,
-              controller: controleur_date,
-              onTap: () => _selectDate(context),
-              decoration: InputDecoration(
-                hintText: selectedDate != null
-                    ? selectedDate.toString()
-                    : "Date de naissance",
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+              const SizedBox(height: 16),
+              
+              // Champ Groupe sanguin (optionnel)
+              _buildInputLabel("Groupe sanguin (Optionnel)"),
+              TextFormField(
+                controller: controleur_groupe_sanguin,
+                decoration: _buildInputDecoration("Groupe sanguin"),
+                validator: (value) {
+                  if (value!.isNotEmpty) {
+                    // Validation des groupes sanguins
+                    List<String> validBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+                    if (!validBloodGroups.contains(value.toUpperCase())) {
+                      return 'Groupe sanguin invalide (A+, A-, B+, B-, AB+, AB-, O+, O-)';
+                    }
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrez votre date de naissance';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: controleur_email,
-              decoration: InputDecoration(
-                hintText: "Email",
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+              const SizedBox(height: 16),
+              
+              // Champ Allergies (optionnel)
+              _buildInputLabel("Allergies (Optionnel)"),
+              TextFormField(
+                controller: controleur_allergies,
+                maxLines: 2,
+                decoration: _buildInputDecoration("Vos allergies"),
               ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrez votre email';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: controleur_groupe_sanguin,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration: InputDecoration(
-                hintText: "Entrez votre groupe sanguin(Optionnel)",
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+              const SizedBox(height: 32),
+              
+              // Bouton d'inscription
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF144DDE),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 2,
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await AuthServices().signup(
+                        email: controleur_email.text,
+                        password: controleur_password.text,
+                        nom: controleur_nom.text,
+                        prenom: controleur_prenom.text,
+                        date: selectedDate.toString(),
+                        groupeSanguin: controleur_groupe_sanguin.text,
+                        allergies: controleur_allergies.text,
+                        context: context,
+                      );
+                    }
+                  },
+                  child: const Text(
+                    "S'inscrire",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            TextFormField(
-              controller: controleur_allergies,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration: InputDecoration(
-                hintText: "Entrez vos allergies(Optionnel)",
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
+              
+              const SizedBox(height: 20),
+              
+              // Lien de connexion
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Déjà inscrit ? ",
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (context) => const Connexion(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Se connecter",
+                      style: TextStyle(
+                        color: Color(0xFF144DDE),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            TextFormField(
-              controller: controleur_password,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: "Mot de passe",
-                border: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(10)),
-                filled: true,
-              ),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrez un mot de passe';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-                backgroundColor: Colors.blue,
-                fixedSize: Size(largeurEcran * 0.8, 50),
-              ),
-              onPressed: () async {
-                _submitForm;
-
-                await AuthServices().signup(
-                    email: controleur_email.text,
-                    password: controleur_password.text,
-                    nom: controleur_nom.text,
-                    prenom: controleur_prenom.text,
-                    date: selectedDate.toString(),
-                    groupeSanguin: controleur_groupe_sanguin.text,
-                    allergies: controleur_allergies.text,
-                    context: context);
-              },
-              child: Text(
-                'Inscription',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ));
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildInputLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.black54,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+  
+  InputDecoration _buildInputDecoration(String hintText) {
+    return InputDecoration(
+      hintText: hintText,
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      filled: true,
+      fillColor: Colors.grey[100],
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
+      ),
+    );
   }
 }
