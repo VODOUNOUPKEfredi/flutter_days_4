@@ -1,0 +1,12 @@
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/mediclic
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/icudtl.dat
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.json
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/shaders/ink_sparkle.frag
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.bin
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/FontManifest.json
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/kernel_blob.bin
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/NOTICES.Z
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/version.json
+/home/fredy/aptMobile/flutter_days _4/flutter_days_4/mediclicinique/build/linux/x64/debug/bundle/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf

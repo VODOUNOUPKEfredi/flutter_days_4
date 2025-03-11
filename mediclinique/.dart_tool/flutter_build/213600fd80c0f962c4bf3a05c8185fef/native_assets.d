@@ -1,0 +1,1 @@
+ /home/fredy/aptMobile/flutter_days\ _4/flutter_days_4/mediclicinique/.dart_tool/flutter_build/213600fd80c0f962c4bf3a05c8185fef/native_assets.yaml: 
