@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mediclic/pages/navigation.dart';
 import 'package:mediclic/pages/onboarding.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,17 +12,18 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final db = FirebaseFirestore.instance;
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const Onboarding(),
+      home: auth.currentUser != null ? Navigation() : Onboarding(),
     );
   }
 }

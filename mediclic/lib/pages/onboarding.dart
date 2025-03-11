@@ -24,17 +24,17 @@ class OnboardingState extends State {
             children: [
               // Logo
               Container(
-                width: 120,
-                height: 120,
+                width: 220,
+                height: 220,
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color.fromARGB(255, 0, 100, 193),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Image.asset(
-                    'assets/images/q.png',
-                    width: 100,
-                    height: 100,
+                    'images/q.png',
+                    width: 200,
+                    height: 200,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -58,16 +58,16 @@ class OnboardingState extends State {
                 ),
               ),
               const SizedBox(height: 30),
-              
+
               // Features list
               _buildFeatureItem("Trouvez rapidement un spécialiste"),
               const SizedBox(height: 12),
               _buildFeatureItem("Gérez votre dossier médical"),
               const SizedBox(height: 12),
               _buildFeatureItem("Prenez des rendez-vous en ligne"),
-              
+
               const SizedBox(height: 40),
-              
+
               // Se connecter button
               SizedBox(
                 width: screenWidth * 0.8,
@@ -98,9 +98,9 @@ class OnboardingState extends State {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Créer un compte button
               SizedBox(
                 width: screenWidth * 0.8,
@@ -136,7 +136,7 @@ class OnboardingState extends State {
       ),
     );
   }
-  
+
   Widget _buildFeatureItem(String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,

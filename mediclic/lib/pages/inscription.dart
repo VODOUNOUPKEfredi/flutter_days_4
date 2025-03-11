@@ -27,7 +27,7 @@ class _InscriptionState extends State<Inscription> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)), // Défaut à 18 ans
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
       firstDate: DateTime(1940, 1),
       lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
@@ -35,13 +35,14 @@ class _InscriptionState extends State<Inscription> {
           data: ThemeData.light().copyWith(
             primaryColor: const Color(0xFF144DDE),
             colorScheme: const ColorScheme.light(primary: Color(0xFF144DDE)),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
@@ -51,15 +52,13 @@ class _InscriptionState extends State<Inscription> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Validation réussie
-    }
+    if (_formKey.currentState!.validate()) {}
   }
 
   @override
   Widget build(BuildContext context) {
     double largeurEcran = MediaQuery.of(context).size.width;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -82,7 +81,6 @@ class _InscriptionState extends State<Inscription> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Champ Nom
               _buildInputLabel("Nom"),
               TextFormField(
                 controller: controleur_nom,
@@ -98,8 +96,6 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Champ Prénom
               _buildInputLabel("Prénoms"),
               TextFormField(
                 controller: controleur_prenom,
@@ -115,8 +111,6 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Champ Date de naissance
               _buildInputLabel("Date de naissance"),
               TextFormField(
                 controller: controleur_date,
@@ -131,8 +125,6 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Champ Email
               _buildInputLabel("Email"),
               TextFormField(
                 controller: controleur_email,
@@ -142,15 +134,14 @@ class _InscriptionState extends State<Inscription> {
                   if (value!.isEmpty) {
                     return 'Veuillez entrer votre email';
                   }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                      .hasMatch(value)) {
                     return 'Veuillez entrer un email valide';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Mot de passe
               _buildInputLabel("Mot de passe"),
               TextFormField(
                 controller: controleur_password,
@@ -169,7 +160,9 @@ class _InscriptionState extends State<Inscription> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureTextPassword ? Icons.visibility_off : Icons.visibility,
+                      _obscureTextPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.grey,
                     ),
                     onPressed: () {
@@ -190,8 +183,6 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Confirmer mot de passe
               _buildInputLabel("Confirmer mot de passe"),
               TextFormField(
                 controller: controleur_confirm_password,
@@ -210,7 +201,9 @@ class _InscriptionState extends State<Inscription> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureTextConfirm ? Icons.visibility_off : Icons.visibility,
+                      _obscureTextConfirm
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.grey,
                     ),
                     onPressed: () {
@@ -231,16 +224,22 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Champ Groupe sanguin (optionnel)
               _buildInputLabel("Groupe sanguin (Optionnel)"),
               TextFormField(
                 controller: controleur_groupe_sanguin,
                 decoration: _buildInputDecoration("Groupe sanguin"),
                 validator: (value) {
                   if (value!.isNotEmpty) {
-                    // Validation des groupes sanguins
-                    List<String> validBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+                    List<String> validBloodGroups = [
+                      'A+',
+                      'A-',
+                      'B+',
+                      'B-',
+                      'AB+',
+                      'AB-',
+                      'O+',
+                      'O-'
+                    ];
                     if (!validBloodGroups.contains(value.toUpperCase())) {
                       return 'Groupe sanguin invalide (A+, A-, B+, B-, AB+, AB-, O+, O-)';
                     }
@@ -249,8 +248,6 @@ class _InscriptionState extends State<Inscription> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              // Champ Allergies (optionnel)
               _buildInputLabel("Allergies (Optionnel)"),
               TextFormField(
                 controller: controleur_allergies,
@@ -258,8 +255,6 @@ class _InscriptionState extends State<Inscription> {
                 decoration: _buildInputDecoration("Vos allergies"),
               ),
               const SizedBox(height: 32),
-              
-              // Bouton d'inscription
               SizedBox(
                 width: double.infinity,
                 height: 54,
@@ -295,10 +290,7 @@ class _InscriptionState extends State<Inscription> {
                   ),
                 ),
               ),
-              
               const SizedBox(height: 20),
-              
-              // Lien de connexion
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -309,7 +301,7 @@ class _InscriptionState extends State<Inscription> {
                   GestureDetector(
                     onTap: () {
                       Navigator.pushReplacement(
-                        context, 
+                        context,
                         MaterialPageRoute(
                           builder: (context) => const Connexion(),
                         ),
@@ -332,7 +324,7 @@ class _InscriptionState extends State<Inscription> {
       ),
     );
   }
-  
+
   Widget _buildInputLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
@@ -345,7 +337,7 @@ class _InscriptionState extends State<Inscription> {
       ),
     );
   }
-  
+
   InputDecoration _buildInputDecoration(String hintText) {
     return InputDecoration(
       hintText: hintText,

@@ -31,17 +31,16 @@ class ConnexionState extends State {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo
               Container(
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color.fromARGB(255, 0, 100, 193),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Image.asset(
-                    'assets/logo.png', // Assurez-vous d'avoir ce logo dans vos assets
+                    'images/q.png',
                     width: 100,
                     height: 100,
                     fit: BoxFit.contain,
@@ -49,7 +48,6 @@ class ConnexionState extends State {
                 ),
               ),
               const SizedBox(height: 24),
-              // Title
               const Text(
                 "Connexion",
                 style: TextStyle(
@@ -100,7 +98,8 @@ class ConnexionState extends State {
                           if (value!.isEmpty) {
                             return 'Veuillez entrer votre email';
                           }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                              .hasMatch(value)) {
                             return 'Veuillez entrer un email valide';
                           }
                           return null;
@@ -134,7 +133,9 @@ class ConnexionState extends State {
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: Colors.grey,
                             ),
                             onPressed: () {
@@ -151,13 +152,10 @@ class ConnexionState extends State {
                           return null;
                         },
                       ),
-                      
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            // Implémentez la logique pour le mot de passe oublié
-                          },
+                          onPressed: () {},
                           child: const Text(
                             "Mot de passe oublié?",
                             style: TextStyle(
@@ -167,10 +165,7 @@ class ConnexionState extends State {
                           ),
                         ),
                       ),
-                      
                       const SizedBox(height: 24),
-                      
-                      // Se connecter button
                       SizedBox(
                         width: double.infinity,
                         height: 54,
@@ -201,10 +196,7 @@ class ConnexionState extends State {
                           ),
                         ),
                       ),
-                      
                       const SizedBox(height: 24),
-                      
-                      // Créer un compte link
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -215,7 +207,7 @@ class ConnexionState extends State {
                           GestureDetector(
                             onTap: () {
                               Navigator.pushReplacement(
-                                context, 
+                                context,
                                 MaterialPageRoute(
                                   builder: (context) => const Inscription(),
                                 ),
