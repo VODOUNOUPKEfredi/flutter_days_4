@@ -89,37 +89,87 @@ class ProfilState extends State {
                                       const Color.fromARGB(255, 227, 227, 227)),
                               child: Icon(
                                 Icons.person,
-                                size: 80,
+                                size: 160,
+                                color: Colors.white,
                               ),
                             ),
                           ],
                         ),
                       )
                     ],
+                  )),
+              Positioned(
+                  top: 300,
+                  left: largeurEcran * 0.55,
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: const Color.fromARGB(255, 73, 73, 73)),
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 25,
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                    ),
                   ))
             ],
           ),
           Container(
             width: largeurEcran,
-            margin: EdgeInsets.only(top: 120, left: 10, right: 10),
+            margin: EdgeInsets.only(top: 120, left: 30, right: 30),
             child: Column(
+              spacing: 10,
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _username == null ? 'Nom: Chargement ...' : "Nom: $_username",
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                Row(
+                  spacing: 10,
+                  children: [
+                    Icon(
+                      Icons.person_3_rounded,
+                      size: 20,
+                      color: const Color.fromARGB(255, 111, 128, 137),
+                    ),
+                    Text(
+                      _username == null
+                          ? ' Chargement ...'
+                          : "$_username $_userSurname",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                  ],
                 ),
-                Text(
-                  _userSurname == null
-                      ? "Prénom: Chargement"
-                      : "Prénom: $_userSurname",
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                Row(
+                  spacing: 10,
+                  children: [
+                    Icon(
+                      Icons.calendar_month,
+                      size: 20,
+                      color: const Color.fromARGB(255, 111, 128, 137),
+                    ),
+                    Text(
+                      "Date de naissance",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                  ],
                 ),
-                Text(
-                  "Email: ${FirebaseAuth.instance.currentUser?.email}",
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                Row(
+                  spacing: 10,
+                  children: [
+                    Icon(
+                      Icons.mail,
+                      size: 20,
+                      color: const Color.fromARGB(255, 111, 128, 137),
+                    ),
+                    Text(
+                      "${FirebaseAuth.instance.currentUser?.email}",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    )
+                  ],
                 )
               ],
             ),
@@ -131,18 +181,36 @@ class ProfilState extends State {
                   CircularProgressIndicator();
                   await AuthServices().signout(context: context);
                 },
-                icon: Icon(
-                  Icons.output,
-                  size: 40,
-                  color: Colors.white,
+                iconAlignment: IconAlignment.start,
+                label: Text(
+                  'Modifier ses informations',
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 255, 255, 255)),
                 ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 145, 170, 229),
+                  fixedSize: Size(largeurEcran * 0.8, 40),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                )),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: ElevatedButton.icon(
+                onPressed: () async {
+                  CircularProgressIndicator();
+                  await AuthServices().signout(context: context);
+                },
                 iconAlignment: IconAlignment.start,
                 label: Text(
                   'Se deconnecter',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 135, 135, 135)),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 0, 89, 255),
+                  backgroundColor: Color.fromARGB(255, 255, 255, 255),
                   fixedSize: Size(largeurEcran * 0.8, 40),
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   shape: RoundedRectangleBorder(
