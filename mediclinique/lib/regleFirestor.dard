@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Vérifie si l'utilisateur est admin
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Collection des utilisateurs
+    match /users/{userId} {
+      // Les utilisateurs peuvent lire leur propre profil
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      // Les utilisateurs peuvent modifier leur propre profil, sauf le rôle
+      allow update: if request.auth != null && 
+                      request.auth.uid == userId && 
+                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']);
+      // Seuls les admins peuvent modifier les rôles
+      allow update: if isAdmin();
+      // Seuls les admins peuvent créer/supprimer des utilisateurs
+      allow create, delete: if isAdmin();
+    }
+  }
+}
