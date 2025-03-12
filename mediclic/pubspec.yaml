@@ -70,7 +70,6 @@ flutter:
      - images/genycologie.png
      - images/heart.png
      - images/ophtamologie.png
-     - images/ dent.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
