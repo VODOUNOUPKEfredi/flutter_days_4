@@ -27,8 +27,8 @@ class HistoriquemedicalState extends State {
             children: [
               GestureDetector(
                 child: Container(
-                  padding: EdgeInsets.all(10),
-                  height: 100,
+                  padding: EdgeInsets.all(16),
+                  height: 106,
                   width: largeurEcran,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
