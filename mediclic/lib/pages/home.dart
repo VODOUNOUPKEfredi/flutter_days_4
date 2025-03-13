@@ -59,6 +59,13 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+       floatingActionButton: FloatingActionButton.extended(
+      onPressed: () {},
+      icon: const Icon(Icons.smart_toy),
+      label: const Text('Discuter avec IA'),
+      backgroundColor: Colors.blue,
+    ),
+    
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -205,7 +212,7 @@ class HomeState extends State<Home> {
                     _buildServiceButton("Rendez-vous", Icons.calendar_today,
                         Colors.red[100]!, Colors.red, Rendezvous()),
                     _buildServiceButton("Cliniques", Icons.local_hospital,
-                        Colors.blue[100]!, Colors.blue, Clinique()),
+                        Colors.blue[100]!, Colors.blue, CliniquesScreen()),
                   ],
                 ),
                 const SizedBox(height: 25),
@@ -233,26 +240,7 @@ class HomeState extends State<Home> {
                   Colors.blue[100]!,
                 ),
                 const SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.smart_toy),
-                    label: const Text(
-                      'Discuter avec IA',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
+              ]  
             ),
           ),
         ),
