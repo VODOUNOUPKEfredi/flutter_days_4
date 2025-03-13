@@ -41,6 +41,9 @@ dependencies:
   geolocator: ^13.0.2
   google_maps_flutter: ^2.10.1
   permission_handler: ^11.4.0
+  geolocator: ^13.0.2
+  google_maps_flutter: ^2.10.1
+  permission_handler: ^11.4.0
 
 
 dev_dependencies:
@@ -73,6 +76,7 @@ flutter:
      - images/genycologie.png
      - images/heart.png
      - images/ophtamologie.png
+    # - images/ dent.png
     # - images/ dent.png
 
 

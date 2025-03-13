@@ -108,7 +108,6 @@ class SpecialisteState extends State {
                   _categories("Ophtamologue", "images/ophtamologie.png"),
                   _categories("Cardiologue", "images/heart.png"),
                   _categories("Gynécologue", "images/genycologie.png"),
-                  _categories("Dentiste", "images/dent.png"),
                   _categories("Pediatre", "images/generaliste.png"),
                   _categories("Dermatologue", "images/generaliste.png"),
                   _categories("Neurologue", "images/generaliste.png")
