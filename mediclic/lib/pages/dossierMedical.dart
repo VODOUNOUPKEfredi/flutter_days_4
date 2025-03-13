@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Dossiermedical extends StatefulWidget {
   const Dossiermedical({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return DossiermedicalState();
@@ -9,70 +12,127 @@ class Dossiermedical extends StatefulWidget {
 }
 
 class DossiermedicalState extends State {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Map<String, dynamic>? _userData;
+  Map<String, dynamic>? _dossierData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+    _fetchDossierData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('users').doc(user.uid).get();
+
+        if (snapshot.exists) {
+          setState(() {
+            _userData = snapshot.data() as Map<String, dynamic>;
+          });
+        } else {
+          print("Document utilisateur non trouvé");
+        }
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des données utilisateur : $e");
+    }
+  }
+
+  Future<void> _fetchDossierData() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        DocumentSnapshot snapshot =
+            await _firestore.collection('dossier').doc(user.uid).get();
+
+        if (snapshot.exists) {
+          setState(() {
+            _dossierData = snapshot.data() as Map<String, dynamic>;
+          });
+        } else {
+          print("Document dossier non trouvé");
+        }
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des données dossier : $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double largeurEcran = MediaQuery.of(context).size.width;
-    double longueurEcran = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text("Mon dossier médical"),
+        title: const Text("Mon dossier médical"),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.download_rounded))
+          IconButton(onPressed: () {}, icon: const Icon(Icons.download_rounded))
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           spacing: 5,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Informations personnelles",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               width: largeurEcran,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    width: 2, color: Colors.grey, style: BorderStyle.solid),
+                  width: 2,
+                  color: Colors.grey,
+                  style: BorderStyle.solid,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 5,
                 children: [
-                  Text("Nom: "),
-                  Text("Prénom: "),
-                  Text("Date de naissance: "),
-                  Text("Groupe sanguin:: "),
-                  Text("Allergies: "),
-                  Text("Maladies chroniques: "),
-                  Text("Contacts d'urgence: ")
+                  Text("Nom: ${_userData?['nom'] ?? 'Chargement...'}"),
+                  Text("Prénom: ${_userData?['prenom'] ?? 'Chargement...'}"),
+                  Text(
+                      "Date de naissance: ${_userData?['date_naissance'] ?? 'Chargement...'}"),
+                  Text(
+                      "Groupe sanguin: ${_userData?['groupe_sanguin'] ?? 'Chargement...'}"),
+                  Text("Allergies: ${_getAllergies()}"),
+                  Text("Maladies chroniques: ${_getMaladiesChroniques()}"),
+                  Text(
+                      "Contacts d'urgence: ${_userData?['contacts_urgence']?.join(', ') ?? 'Aucun'}"),
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   "Antécédents médicaux et chirugicaux",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                Text(
+                const Text(
                   "Plus",
                   style: TextStyle(color: Colors.blue),
                 )
               ],
             ),
             Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 width: largeurEcran,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -83,7 +143,7 @@ class DossiermedicalState extends State {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Consultation",
                         style: TextStyle(fontSize: 15),
                       ),
@@ -91,16 +151,16 @@ class DossiermedicalState extends State {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          Text(
+                          const Text(
                             "10 Décembre 2024",
                             style: TextStyle(fontSize: 10, color: Colors.blue),
                           ),
-                          Text("18h44",
+                          const Text("18h44",
                               style:
                                   TextStyle(fontSize: 10, color: Colors.blue))
                         ],
                       ),
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         mainAxisSize: MainAxisSize.max,
                         children: [Text("Dr Focas "), Text("Chirugien")],
@@ -108,22 +168,22 @@ class DossiermedicalState extends State {
                     ],
                   ),
                 )),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Text(
+            const Text(
               "Historique médical",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 width: largeurEcran,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                       width: 2, color: Colors.grey, style: BorderStyle.solid),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "Rien à afficher",
                     style: TextStyle(fontSize: 25, color: Colors.grey),
@@ -133,25 +193,25 @@ class DossiermedicalState extends State {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   "Documents médicaux et légaux",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-                Text(
+                const Text(
                   "Voir plus",
                   style: TextStyle(color: Colors.blue),
                 ),
               ],
             ),
             Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 width: largeurEcran,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                       width: 2, color: Colors.grey, style: BorderStyle.solid),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "Rien à afficher",
                     style: TextStyle(fontSize: 25, color: Colors.grey),
@@ -161,8 +221,8 @@ class DossiermedicalState extends State {
                 onTap: () {},
                 child: Container(
                     height: 60,
-                    decoration: BoxDecoration(color: Colors.blue),
-                    child: Center(
+                    decoration: const BoxDecoration(color: Colors.blue),
+                    child: const Center(
                       child: Text(
                         "Voir l'historique des accès",
                         style: TextStyle(
@@ -175,5 +235,30 @@ class DossiermedicalState extends State {
         ),
       ),
     );
+  }
+
+  String _getAllergies() {
+    List<String> allergies = [];
+    if (_dossierData != null && _dossierData!['allergies'] != null) {
+      allergies.addAll(List<String>.from(_dossierData!['allergies']));
+    }
+    if (_dossierData != null && _dossierData!['allergies'] != null) {
+      allergies.addAll(List<String>.from(_dossierData!['allergies']));
+    }
+    return allergies.isNotEmpty ? allergies.join(', ') : 'Aucune';
+  }
+
+  String _getMaladiesChroniques() {
+    List<String> maladiesChroniques = [];
+    if (_dossierData != null && _dossierData!['maladies_chroniques'] != null) {
+      maladiesChroniques
+          .addAll(List<String>.from(_dossierData!['maladies_chroniques']));
+    }
+    if (_dossierData != null && _dossierData!['Maladies Chroniques'] != null) {
+      maladiesChroniques.add(_dossierData!['Maladies Chroniques'].toString());
+    }
+    return maladiesChroniques.isNotEmpty
+        ? maladiesChroniques.join(', ')
+        : 'Aucune';
   }
 }

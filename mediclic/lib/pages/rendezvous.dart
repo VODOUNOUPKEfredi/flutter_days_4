@@ -4,7 +4,7 @@ import 'package:mediclic/services/authentification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Rendezvous extends StatefulWidget {
-  Rendezvous({super.key});
+  const Rendezvous({super.key});
   @override
   State<StatefulWidget> createState() {
     return RendezvousState();

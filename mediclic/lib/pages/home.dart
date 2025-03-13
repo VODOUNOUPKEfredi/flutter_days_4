@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mediclic/services/authentification.dart';
 import 'package:mediclic/pages/specialiste.dart';
 import 'package:mediclic/pages/clinique.dart';
 import 'package:mediclic/pages/rendezvous.dart';

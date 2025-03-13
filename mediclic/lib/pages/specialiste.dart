@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Specialiste extends StatefulWidget {
-  Specialiste({super.key});
+  const Specialiste({super.key});
 
   @override
   State<StatefulWidget> createState() {

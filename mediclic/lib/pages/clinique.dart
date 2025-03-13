@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:mediclic/pages/models.dart';
 
 class CliniquesScreen extends StatefulWidget {
-  const CliniquesScreen({Key? key}) : super(key: key);
+  const CliniquesScreen({super.key});
 
   @override
   State<CliniquesScreen> createState() => _CliniquesScreenState();
@@ -238,7 +238,7 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
 class ClinicCard extends StatelessWidget {
   final Clinic clinic;
 
-  const ClinicCard({Key? key, required this.clinic}) : super(key: key);
+  const ClinicCard({super.key, required this.clinic});
 
   @override
   Widget build(BuildContext context) {
