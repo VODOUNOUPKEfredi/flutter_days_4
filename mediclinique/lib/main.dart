@@ -54,7 +54,6 @@ import 'firebase_options.dart';
 
 // Import des pages
 import './pages/login_page.dart';
-import './pages/register_page.dart';
 // import './doctor/rootDoctor.dart'; // Décommentez si nécessaire
 
 void main() async {

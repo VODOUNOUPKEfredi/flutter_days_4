@@ -13,7 +13,7 @@ class DoctorAvailability {
     required this.endTime,
   });
 
-  // Convert DoctorAvailability object to a Map for Firestore
+  // Convert DoctorAvailability object to a Map pour  Firestore
   Map<String, dynamic> toMap() {
     return {
       'doctor_id': doctorId,
