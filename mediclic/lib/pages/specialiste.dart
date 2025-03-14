@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mediclic/pages/detailSpecialiste.dart';
 
 class Specialiste extends StatefulWidget {
   const Specialiste({super.key});
@@ -21,7 +22,7 @@ class SpecialisteState extends State {
     });
 
     QuerySnapshot snapshot;
-    if (query.isNotEmpty) {
+    /*if (query.isNotEmpty) {
       snapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('role', isEqualTo: 'medecin')
@@ -31,6 +32,20 @@ class SpecialisteState extends State {
       snapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('role', isEqualTo: 'medecin')
+          .where('specialite', isEqualTo: _selectedCategory)
+          .get();
+    } else {
+      return;
+    }
+    */
+    if (query.isNotEmpty) {
+      snapshot = await FirebaseFirestore.instance
+          .collection('docteurs')
+          .where('specialite', isEqualTo: query)
+          .get();
+    } else if (_selectedCategory.isNotEmpty) {
+      snapshot = await FirebaseFirestore.instance
+          .collection('docteurs')
           .where('specialite', isEqualTo: _selectedCategory)
           .get();
     } else {
@@ -88,6 +103,9 @@ class SpecialisteState extends State {
                 ],
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
             const Text(
               "  Catégories",
               style: TextStyle(
@@ -132,10 +150,78 @@ class SpecialisteState extends State {
                     itemBuilder: (context, index) {
                       final doc =
                           _searchResults[index].data() as Map<String, dynamic>;
-                      return ListTile(
-                        title: Text(doc['nom'] ?? 'Nom inconnu'),
-                        subtitle:
-                            Text(doc['specialite'] ?? 'Spécialité inconnue'),
+                      return GestureDetector(
+                        onTap: () {
+                          if (doc.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Detailspecialiste(
+                                    docteur: _searchResults[index]),
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                            padding: EdgeInsets.all(8),
+                            height: 100,
+                            decoration: BoxDecoration(
+                                color: const Color.fromARGB(27, 96, 125, 139),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Row(
+                              spacing: 20,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(
+                                        255, 197, 184, 198),
+                                    borderRadius: BorderRadius.circular(60),
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      spacing: 5,
+                                      children: [
+                                        Text(
+                                          "Dr",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          doc['nom'] ?? 'Nom inconnu',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      doc['specialite'] ??
+                                          'Spécialité inconnue',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: const Color.fromARGB(
+                                              113, 0, 0, 0)),
+                                    ),
+                                    Text(
+                                      doc['cliniqueId'] ?? 'Clinique',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: const Color.fromARGB(
+                                              113, 0, 0, 0)),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )),
                       );
                     },
                   ),

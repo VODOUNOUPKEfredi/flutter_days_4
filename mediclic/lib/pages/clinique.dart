@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:mediclic/pages/models.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importez Firebase Firestore
 
 class CliniquesScreen extends StatefulWidget {
   const CliniquesScreen({super.key});
@@ -30,11 +30,11 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
     } else {
       setState(() {
         _isLoading = false;
-        // Load default clinics if location is not available
-        _loadMockClinics();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('L\'accès à la localisation est nécessaire pour afficher les cliniques à proximité')),
+        const SnackBar(
+            content: Text(
+                'L\'accès à la localisation est nécessaire pour afficher les cliniques à proximité')),
       );
     }
   }
@@ -52,86 +52,52 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
       print('Error getting location: $e');
       setState(() {
         _isLoading = false;
-        _loadMockClinics();
       });
     }
   }
 
-  void _loadNearbyClinicsList() {
-    // In a real app, you would fetch clinics from an API based on location
-    // For now, we'll use mock data
-    _loadMockClinics();
-    
-    // Sort by distance if we have location
-    if (_currentPosition != null) {
-      _nearbyClinicsList.sort((a, b) {
-        double distanceA = Geolocator.distanceBetween(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
-          a.latitude,
-          a.longitude,
-        );
-        double distanceB = Geolocator.distanceBetween(
-          _currentPosition!.latitude,
-          _currentPosition!.longitude,
-          b.latitude,
-          b.longitude,
-        );
-        return distanceA.compareTo(distanceB);
+  Future<void> _loadNearbyClinicsList() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('cliniques').get();
+
+      _nearbyClinicsList = querySnapshot.docs.map((doc) {
+        return Clinic.fromJson(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      if (_currentPosition != null) {
+        for (var clinic in _nearbyClinicsList) {
+          clinic.distance = Geolocator.distanceBetween(
+                _currentPosition!.latitude,
+                _currentPosition!.longitude,
+                clinic.latitude,
+                clinic.longitude,
+              ) /
+              1000;
+        }
+
+        _nearbyClinicsList.sort((a, b) => a.distance.compareTo(b.distance));
+      }
+
+      _filteredClinicsList = List.from(_nearbyClinicsList);
+    } catch (e) {
+      print('Error loading clinics: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Erreur lors du chargement des cliniques: <span class="math-inline">e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
-    
-    _filteredClinicsList = List.from(_nearbyClinicsList);
-    setState(() {
-      _isLoading = false;
-    });
   }
-  
-  void _loadMockClinics() {
-    _nearbyClinicsList = [
-      Clinic(
-        id: "1",
-        name: "Clinique Médiale",
-        address: "23 Avenue de la République, Paris",
-        specialties: ["Cardiologie", "Pédiatrie", "Dermatologie"],
-        rating: 4.7,
-        latitude: 48.8566,
-        longitude: 2.3522,
-        distance: 1.2,
-      ),
-      Clinic(
-        id: "2",
-        name: "Centre Médical Saint-Paul",
-        address: "8 Rue Saint-Paul, Paris",
-        specialties: ["Orthopédie", "Radiologie", "Neurologie"],
-        rating: 4.5,
-        latitude: 48.8546,
-        longitude: 2.3600,
-        distance: 2.4,
-      ),
-      Clinic(
-        id: "3",
-        name: "Polyclinique des Alpes",
-        address: "45 Boulevard de l'Hôpital, Paris",
-        specialties: ["Gynécologie", "Ophtalmologie", "ORL"],
-        rating: 4.2,
-        latitude: 48.8396,
-        longitude: 2.3622,
-        distance: 3.5,
-      ),
-      Clinic(
-        id: "4",
-        name: "Clinique Lafayette",
-        address: "10 Rue Lafayette, Paris",
-        specialties: ["Médecine générale", "Psychiatrie", "Kinésithérapie"],
-        rating: 4.8,
-        latitude: 48.8737,
-        longitude: 2.3414,
-        distance: 1.8,
-      ),
-    ];
-  }
-  
+
   void _filterClinics(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -151,8 +117,8 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cliniques à proximité', 
-          style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Cliniques à proximité',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
       ),
       body: Column(
@@ -175,14 +141,13 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
               onChanged: _filterClinics,
             ),
           ),
-          // Google Maps container removed to fix the error
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Cliniques à proximité (${_filteredClinicsList.length})',
+                  'Cliniques à proximité :${_filteredClinicsList.length}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -203,9 +168,11 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
                   onChanged: (value) {
                     setState(() {
                       if (value == 'distance') {
-                        _filteredClinicsList.sort((a, b) => a.distance.compareTo(b.distance));
+                        _filteredClinicsList
+                            .sort((a, b) => a.distance.compareTo(b.distance));
                       } else if (value == 'rating') {
-                        _filteredClinicsList.sort((a, b) => b.rating.compareTo(a.rating));
+                        _filteredClinicsList
+                            .sort((a, b) => b.rating.compareTo(a.rating));
                       }
                     });
                   },
@@ -231,6 +198,40 @@ class _CliniquesScreenState extends State<CliniquesScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class Clinic {
+  final String id;
+  final String name;
+  final String address;
+  final List<String> specialties;
+  final double rating;
+  final double latitude;
+  final double longitude;
+  double distance; // Ajoutez cette ligne pour la distance
+
+  Clinic({
+    required this.id,
+    required this.name,
+    required this.address,
+    required this.specialties,
+    required this.rating,
+    required this.latitude,
+    required this.longitude,
+    this.distance = 0.0, // Initialisez la distance à 0
+  });
+
+  factory Clinic.fromJson(Map<String, dynamic> json, String id) {
+    return Clinic(
+      id: id,
+      name: json['nom'] ?? '',
+      address: json['address'] ?? '',
+      specialties: List<String>.from(json['specialtes'] ?? []),
+      rating: (json['rating'] ?? 0.0).toDouble(),
+      latitude: (json['latitude'] ?? 0.0).toDouble(),
+      longitude: (json['longitude'] ?? 0.0).toDouble(),
     );
   }
 }
@@ -266,7 +267,8 @@ class ClinicCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.purple[50],
                     borderRadius: BorderRadius.circular(20),
@@ -317,7 +319,8 @@ class ClinicCard extends StatelessWidget {
               runSpacing: 8,
               children: clinic.specialties.map((specialty) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(16),
@@ -375,4 +378,3 @@ class ClinicCard extends StatelessWidget {
     );
   }
 }
-

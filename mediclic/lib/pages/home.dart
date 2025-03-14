@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mediclic/pages/gemini.dart';
 import 'package:mediclic/pages/specialiste.dart';
 import 'package:mediclic/pages/clinique.dart';
 import 'package:mediclic/pages/rendezvous.dart';
@@ -58,189 +59,191 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-       floatingActionButton: FloatingActionButton.extended(
-      onPressed: () {},
-      icon: const Icon(Icons.smart_toy),
-      label: const Text('Discuter avec IA'),
-      backgroundColor: Colors.blue,
-    ),
-    
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => GeminiChatPage()),
+          );
+        },
+        icon: const Icon(Icons.smart_toy),
+        label: const Text('Discuter avec IA'),
+        backgroundColor: Colors.blue,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "https://images.pexels.com/photos/31035109/pexels-photo-31035109.jpeg"),
-                          radius: 25,
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Good Morning',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              _userSurname == null
-                                  ? ' Chargement ...'
-                                  : "$_username $_userSurname",
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.notifications_outlined),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.favorite),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      const SizedBox(width: 10),
-                      const Icon(Icons.search, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search',
-                            hintStyle: TextStyle(color: Colors.grey[600]),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          style: const TextStyle(color: Colors.black87),
-                        ),
+                      const CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            "https://images.pexels.com/photos/31035109/pexels-photo-31035109.jpeg"),
+                        radius: 25,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.tune),
-                        onPressed: () {},
-                        color: Colors.blue,
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Good Morning',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            _userSurname == null
+                                ? ' Chargement ...'
+                                : "$_username $_userSurname",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 160,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: 3,
-                    onPageChanged: (int page) {
-                      setState(() {
-                        _currentPage = page;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          return child!;
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          decoration: BoxDecoration(
-                            color: index == 0
-                                ? Colors.purple[300]
-                                : Colors.blue[300],
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: index == 0
-                              ? _buildMedicalChecksBanner()
-                              : _buildGenericBanner(index),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    return Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? Colors.blue
-                            : Colors.grey[300],
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.notifications_outlined),
+                        onPressed: () {},
                       ),
-                    );
-                  }),
+                      IconButton(
+                        icon: const Icon(Icons.favorite),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Row(
                   children: [
-                    _buildServiceButton("Spécialistes", Icons.people,
-                        Colors.amber[100]!, Colors.amber, Specialiste()),
-                    _buildServiceButton("Rendez-vous", Icons.calendar_today,
-                        Colors.red[100]!, Colors.red, Rendezvous()),
-                    _buildServiceButton("Cliniques", Icons.local_hospital,
-                        Colors.blue[100]!, Colors.blue, CliniquesScreen()),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.search, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search',
+                          hintStyle: TextStyle(color: Colors.grey[600]),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: const TextStyle(color: Colors.black87),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.tune),
+                      onPressed: () {},
+                      color: Colors.blue,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 25),
-                const Text(
-                  'Prochain rendez-vous',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 160,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: 3,
+                  onPageChanged: (int page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        return child!;
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        decoration: BoxDecoration(
+                          color: index == 0
+                              ? Colors.purple[300]
+                              : Colors.blue[300],
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: index == 0
+                            ? _buildMedicalChecksBanner()
+                            : _buildGenericBanner(index),
+                      ),
+                    );
+                  },
                 ),
-                const SizedBox(height: 15),
-                _buildAppointmentCard(
-                  "Dr. Marie Martin",
-                  "Cardiologue",
-                  "Lundi 10 Mars",
-                  "14h00",
-                  Colors.pink[100]!,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (index) {
+                  return Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentPage == index
+                          ? Colors.blue
+                          : Colors.grey[300],
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildServiceButton("Spécialistes", Icons.people,
+                      Colors.amber[100]!, Colors.amber, Specialiste()),
+                  _buildServiceButton("Rendez-vous", Icons.calendar_today,
+                      Colors.red[100]!, Colors.red, Rendezvous()),
+                  _buildServiceButton("Cliniques", Icons.local_hospital,
+                      Colors.blue[100]!, Colors.blue, CliniquesScreen()),
+                ],
+              ),
+              const SizedBox(height: 25),
+              const Text(
+                'Prochain rendez-vous',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 10),
-                _buildAppointmentCard(
-                  "Dr. Pierre Dupont",
-                  "Cardiologue",
-                  "Lundi 13 Mars",
-                  "15h00",
-                  Colors.blue[100]!,
-                ),
-                const SizedBox(height: 20),
-              ]  
-            ),
+              ),
+              const SizedBox(height: 15),
+              _buildAppointmentCard(
+                "Dr. Marie Martin",
+                "Cardiologue",
+                "Lundi 10 Mars",
+                "14h00",
+                Colors.pink[100]!,
+              ),
+              const SizedBox(height: 10),
+              _buildAppointmentCard(
+                "Dr. Pierre Dupont",
+                "Cardiologue",
+                "Lundi 13 Mars",
+                "15h00",
+                Colors.blue[100]!,
+              ),
+              const SizedBox(height: 20),
+            ]),
           ),
         ),
       ),
