@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mediclic/pages/gemini.dart';
 import 'package:mediclic/pages/specialiste.dart';
 import 'package:mediclic/pages/clinique.dart';
-import 'package:mediclic/pages/rendezvous.dart';
+import 'package:mediclic/pages/phamacie.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -212,8 +212,8 @@ class HomeState extends State<Home> {
                 children: [
                   _buildServiceButton("Spécialistes", Icons.people,
                       Colors.amber[100]!, Colors.amber, Specialiste()),
-                  _buildServiceButton("Rendez-vous", Icons.calendar_today,
-                      Colors.red[100]!, Colors.red, Rendezvous()),
+                  _buildServiceButton("Phamacies", Icons.local_pharmacy_rounded,
+                      Colors.red[100]!, Colors.red, PharmaciesScreen()),
                   _buildServiceButton("Cliniques", Icons.local_hospital,
                       Colors.blue[100]!, Colors.blue, CliniquesScreen()),
                 ],
