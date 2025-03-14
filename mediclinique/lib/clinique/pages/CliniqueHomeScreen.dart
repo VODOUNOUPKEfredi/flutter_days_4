@@ -26,9 +26,9 @@ class _RegisterDoctorWidgetState extends State<RegisterDoctorWidget> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.all(10),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(10),
         child: Form(
           key: _formKey,
           child: Column(
@@ -39,7 +39,7 @@ class _RegisterDoctorWidgetState extends State<RegisterDoctorWidget> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               
               // Nom
               TextFormField(
@@ -245,4 +245,5 @@ class _RegisterDoctorWidgetState extends State<RegisterDoctorWidget> {
       }
     }
   }
+  
 }

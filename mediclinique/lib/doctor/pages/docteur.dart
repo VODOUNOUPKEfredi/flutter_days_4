@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:mediclic/main.dart';
+import 'package:mediclic/doctor/pages/dossier1.dart';
+void main() async {
+  
+  
+  // Lancer l'application
+  runApp(MyApp());
+}
 class DocteurPage extends StatefulWidget {
   const DocteurPage({super.key});
 
@@ -10,6 +17,12 @@ class DocteurPage extends StatefulWidget {
 class _DocteurPageState extends State<DocteurPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Column(
+        children: [
+DossierMedicalForm(),
+        ],
+      ),
+    );
   }
 }

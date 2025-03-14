@@ -1,37 +1,5 @@
-// user_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel {
-  final String uid;
-  final String nom;
-  final String email;
-  final String role;
-
-  UserModel({
-    required this.uid,
-    required this.nom,
-    required this.email,
-    required this.role,
-  });
-
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      uid: map['uid'] ?? '',
-      nom: map['nom'] ?? '',
-      email: map['email'] ?? '',
-      role: map['role'] ?? 'user', // 'user' par défaut
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'uid': uid,
-      'nom': nom,
-      'email': email,
-      'role': role,
-    };
-  }
-}
 class DoctorAvailability {
   final String doctorId;
   final DateTime date;
@@ -64,6 +32,4 @@ class DoctorAvailability {
       endTime: map['end_time'] ?? '',
     );
   }
-
-
 }
