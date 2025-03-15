@@ -43,6 +43,8 @@ dependencies:
   geocoding: ^3.0.0
   geolocator: ^13.0.2
   flutter_vector_icons: ^2.0.0
+  table_calendar: ^3.2.0
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

@@ -1,83 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Pour la gestion de la date
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: AvailabilityCalendar(),
-  ));
-}
-class DocteurDispoPage extends StatefulWidget {
-  const DocteurDispoPage({super.key});
-
-  @override
-  State<DocteurDispoPage> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<DocteurDispoPage> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
-
-// Classe représentant les disponibilités d'un docteur
 class DoctorAvailability {
   final DateTime date;
   final List<String> availableTimes;
 
   DoctorAvailability({required this.date, required this.availableTimes});
-
-  // Ajouter ou modifier la disponibilité pour une date
-  void addAvailability(String time) {
-    if (!availableTimes.contains(time)) {
-      availableTimes.add(time);
-    }
-  }
-
-  // Supprimer une disponibilité
-  void removeAvailability(String time) {
-    availableTimes.remove(time);
-  }
-
-  // Vérifier si une certaine heure est disponible
-  bool isAvailableAt(String time) {
-    return availableTimes.contains(time);
-  }
 }
 
-// Classe principale pour afficher le calendrier
 class AvailabilityCalendar extends StatefulWidget {
   @override
   _AvailabilityCalendarState createState() => _AvailabilityCalendarState();
 }
 
 class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+  
   List<DoctorAvailability> doctorAvailabilities = [
-    DoctorAvailability(
-      date: DateTime(2025, 3, 15),
-      availableTimes: ['09:00 AM', '11:00 AM', '02:00 PM'],
-    ),
-    DoctorAvailability(
-      date: DateTime(2025, 3, 16),
-      availableTimes: ['10:00 AM', '12:00 PM'],
-    ),
-    DoctorAvailability(
-      date: DateTime(2025, 3, 17),
-      availableTimes: ['10:00 AM', '11:00 AM', '02:00 PM'],
-    ),DoctorAvailability(
-      date: DateTime(2025, 3, 20),
-      availableTimes: ['09:00 AM', '11:00 AM', '02:00 PM'],
-    ),
-    // Ajouter d'autres dates et disponibilités ici
+    DoctorAvailability(date: DateTime(2025, 3, 15), availableTimes: ['09:00 AM', '11:00 AM', '02:00 PM']),
+    DoctorAvailability(date: DateTime(2025, 3, 16), availableTimes: ['10:00 AM', '12:00 PM']),
+    DoctorAvailability(date: DateTime(2025, 3, 17), availableTimes: ['10:00 AM', '11:00 AM', '02:00 PM']),
+    DoctorAvailability(date: DateTime(2025, 3, 20), availableTimes: ['09:00 AM', '11:00 AM', '02:00 PM']),
   ];
 
-  // Récupère les disponibilités pour une date donnée
-  DoctorAvailability? getAvailability(DateTime date) {
+  DoctorAvailability getAvailability(DateTime date) {
     return doctorAvailabilities.firstWhere(
-      (availability) => availability.date.year == date.year &&
-                        availability.date.month == date.month &&
-                        availability.date.day == date.day,
-      orElse: () =>  DoctorAvailability(date: date, availableTimes: []),
+      (availability) => isSameDay(availability.date, date),
+      orElse: () => DoctorAvailability(date: date, availableTimes: []),
     );
   }
 
@@ -85,38 +37,71 @@ class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendrier de Disponibilité du Docteur'),
+        title: Text('Disponibilités du Docteur', style: TextStyle(fontSize: 18)),
+        backgroundColor: Colors.blueAccent,
       ),
       body: Column(
         children: [
-          CalendarDatePicker(
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2025, 1, 1),
-            lastDate: DateTime(2025, 12, 31),
-            onDateChanged: (date) {
-              setState(() {});
+          TableCalendar(
+            firstDay: DateTime(2025, 1, 1),
+            lastDay: DateTime(2025, 12, 31),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
             },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(0.5),
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.blueAccent,
+                shape: BoxShape.circle,
+              ),
+              weekendTextStyle: TextStyle(color: Colors.red),
+            ),
+            headerStyle: HeaderStyle(formatButtonVisible: false),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: doctorAvailabilities.length,
-              itemBuilder: (context, index) {
-                final availability = doctorAvailabilities[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(DateFormat.yMMMd().format(availability.date)),
-                    subtitle: Text(availability.availableTimes.join(', ')),
-                    tileColor: Colors.lightBlueAccent,
-                  ),
-                );
-              },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildAvailabilityList(),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildAvailabilityList() {
+    DoctorAvailability availability = getAvailability(_selectedDay);
+    
+    if (availability.availableTimes.isEmpty) {
+      return Center(
+        child: Text('Aucune disponibilité',
+            style: TextStyle(fontSize: 18, color: Colors.grey)),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: availability.availableTimes.length,
+      itemBuilder: (context, index) {
+        return Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Icon(Icons.schedule, color: Colors.blueAccent),
+            title: Text(availability.availableTimes[index],
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            tileColor: Colors.blue.shade50,
+          ),
+        );
+      },
+    );
+  }
 }
-
-
-
