@@ -70,7 +70,7 @@ class MedicalRecordService {
       
       // Récupérer le document depuis Firestore
       final docSnapshot = await _firestore
-          .collection('medicalRecords')
+          .collection('dossierMedical')
           .doc(userId)
           .get();
       
