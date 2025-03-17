@@ -152,7 +152,7 @@ class ConnexionState extends State {
                           return null;
                         },
                       ),
-                      Align(
+                      /*Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {},
@@ -164,7 +164,7 @@ class ConnexionState extends State {
                             ),
                           ),
                         ),
-                      ),
+                      ),*/
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
@@ -197,10 +197,11 @@ class ConnexionState extends State {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Vous n'avez pas de compte ? ",
                             style: TextStyle(color: Colors.black54),
                           ),

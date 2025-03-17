@@ -40,13 +40,13 @@ class SpecialisteState extends State {
     */
     if (query.isNotEmpty) {
       snapshot = await FirebaseFirestore.instance
-          .collection('docteurs')
-          .where('specialite', isEqualTo: query)
+          .collection('doctors')
+          .where('speciality', isEqualTo: query)
           .get();
     } else if (_selectedCategory.isNotEmpty) {
       snapshot = await FirebaseFirestore.instance
-          .collection('docteurs')
-          .where('specialite', isEqualTo: _selectedCategory)
+          .collection('doctors')
+          .where('speciality', isEqualTo: _selectedCategory)
           .get();
     } else {
       return;
@@ -163,15 +163,15 @@ class SpecialisteState extends State {
                           }
                         },
                         child: Container(
-                            padding: EdgeInsets.all(8),
-                            height: 100,
+                            padding: EdgeInsets.all(5),
+                            height: 80,
                             decoration: BoxDecoration(
                                 color: const Color.fromARGB(27, 96, 125, 139),
                                 borderRadius: BorderRadius.circular(20)),
                             child: Row(
                               spacing: 20,
                               children: [
-                                Container(
+                                /*Container(
                                   height: 80,
                                   width: 80,
                                   decoration: BoxDecoration(
@@ -179,6 +179,11 @@ class SpecialisteState extends State {
                                         255, 197, 184, 198),
                                     borderRadius: BorderRadius.circular(60),
                                   ),
+                                ),*/
+                                CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://images.pexels.com/photos/31035109/pexels-photo-31035109.jpeg"),
+                                  radius: 25,
                                 ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -187,24 +192,25 @@ class SpecialisteState extends State {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
+                                      mainAxisSize: MainAxisSize.max,
                                       spacing: 5,
                                       children: [
                                         Text(
                                           "Dr",
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w600),
                                         ),
                                         Text(
-                                          doc['nom'] ?? 'Nom inconnu',
+                                          doc['name'] ?? 'Nom inconnu',
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ],
                                     ),
                                     Text(
-                                      doc['specialite'] ??
+                                      doc['speciality'] ??
                                           'Spécialité inconnue',
                                       style: TextStyle(
                                           fontSize: 15,

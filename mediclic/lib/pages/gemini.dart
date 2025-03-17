@@ -55,7 +55,7 @@ class _GeminiChatPageState extends State<GeminiChatPage> {
           'parts': [
             {
               'text':
-                  'L\'utilisateur souffre de: $symptoms. Quel ou quelles spécialiste (s) lui conseillerais tu ?'
+                  'L\'utilisateur souffre de: $symptoms. Recommande lui au plus deux types de medecin ou sspécialiste qu\'il pourrait consulter '
             }
           ]
         }
