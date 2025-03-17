@@ -547,7 +547,6 @@ Future<void> _showRendezvousDialog(
               ElevatedButton(
                 onPressed: () {
                   if (selectedDay != null && selectedTime != null) {
-                    // TODO: Enregistrer le rendez-vous avec le jour et l'heure choisis
                     print("Rendez-vous pris pour $selectedDay à $selectedTime");
                     Navigator.of(context).pop();
                   }
