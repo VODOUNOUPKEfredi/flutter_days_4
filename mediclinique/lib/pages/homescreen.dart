@@ -43,7 +43,7 @@ class _HomeContainerState extends State<HomeContainer> {
         HistoriquePage(),
         ConsultationsPage(),
         DossierMedicalForm(),
-        AvailabilityCalendar(doctorId: '',),
+        MedicalSchedulerApp(),
         DoctorProfilePage(),
       ];
       _appBarTitles = ["Tableau de bord", "Historique", "Rendez-vous", "Dossiers médicaux", "Calendrier", "Profil"];

@@ -1,316 +1,601 @@
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Importation nécessaire
 import 'package:table_calendar/table_calendar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
-class DoctorAvailability {
-  final DateTime date;
-  List<TimeSlot> timeSlots;
-
-  DoctorAvailability({required this.date, required this.timeSlots});
-
-  // Méthodes pour convertir en/depuis Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'date': Timestamp.fromDate(date),
-      'timeSlots': timeSlots.map((slot) => slot.toMap()).toList(),
-    };
-  }
-
-  static DoctorAvailability fromMap(Map<String, dynamic> map) {
-    return DoctorAvailability(
-      date: (map['date'] as Timestamp).toDate(),
-      timeSlots: List<TimeSlot>.from(
-        (map['timeSlots'] as List).map((slot) => TimeSlot.fromMap(slot)),
-      ),
-    );
-  }
+void main() {
+  runApp(const MedicalSchedulerApp());
 }
 
-class TimeSlot {
-  final String time;
-  bool isAvailable;
+class MedicalSchedulerApp extends StatelessWidget {
+  const MedicalSchedulerApp({Key? key}) : super(key: key);
 
-  TimeSlot({required this.time, this.isAvailable = false});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'time': time,
-      'isAvailable': isAvailable,
-    };
-  }
-
-  static TimeSlot fromMap(Map<String, dynamic> map) {
-    return TimeSlot(
-      time: map['time'],
-      isAvailable: map['isAvailable'] ?? false,
-    );
-  }
-}
-
-class AvailabilityCalendar extends StatefulWidget {
-  final String doctorId;
-  
-  const AvailabilityCalendar({Key? key, required this.doctorId}) : super(key: key);
-  
   @override
-  _AvailabilityCalendarState createState() => _AvailabilityCalendarState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Disponibilité des Médecins',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: const DoctorSchedulePage(),
+    );
+  }
 }
 
-class _AvailabilityCalendarState extends State<AvailabilityCalendar> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _selectedDay = DateTime.now();
+class Doctor {
+  final String id;
+  final String name;
+  final String specialty;
+  final Color color;
+
+  Doctor({
+    required this.id, 
+    required this.name, 
+    required this.specialty, 
+    required this.color
+  });
+}
+
+class Availability {
+  final String id;
+  final String doctorId;
+  final DateTime start;
+  final DateTime end;
+  final String note;
+
+  Availability({
+    required this.id, 
+    required this.doctorId, 
+    required this.start, 
+    required this.end, 
+    this.note = ''
+  });
+}
+
+class DoctorSchedulePage extends StatefulWidget {
+  const DoctorSchedulePage({Key? key}) : super(key: key);
+
+  @override
+  _DoctorSchedulePageState createState() => _DoctorSchedulePageState();
+}
+
+class _DoctorSchedulePageState extends State<DoctorSchedulePage> {
+  CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
-  bool _isLoading = true;
-  
-  // Heures disponibles par défaut
-  final List<String> _defaultTimeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00',
-    '14:00', '15:00', '16:00', '17:00', '18:00',
-  ];
-  
-  // Map pour stocker toutes les disponibilités
-  final Map<DateTime, List<TimeSlot>> _availabilityMap = {};
-  
+  DateTime? _selectedDay;
+  Map<String, Doctor> doctors = {};
+  Map<DateTime, List<Availability>> availabilities = {};
+
   @override
   void initState() {
     super.initState();
-    // Initialiser les données de localisation avant de les utiliser
-    initializeDateFormatting('fr_FR', null).then((_) {
-      _loadAvailabilities();
-    });
-  }
-  
-  // Charge les disponibilités depuis la base de données
-  Future<void> _loadAvailabilities() async {
-    setState(() {
-      _isLoading = true;
-    });
+    _selectedDay = _focusedDay;
     
-    try {
-      // Exemple avec Firebase Firestore
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('doctors')
-          .doc(widget.doctorId)
-          .collection('availabilities')
-          .get();
-      
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        final availability = DoctorAvailability.fromMap(data);
-        
-        // Formatez la date pour la clé du Map
-        final dateKey = DateTime(
-          availability.date.year,
-          availability.date.month,
-          availability.date.day,
-        );
-        
-        _availabilityMap[dateKey] = availability.timeSlots;
-      }
-    } catch (e) {
-      print('Erreur lors du chargement des disponibilités: $e');
-      // Gérer l'erreur (afficher un message, etc.)
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-  
-  // Enregistre les disponibilités dans la base de données
-  Future<void> _saveAvailability(DateTime date, List<TimeSlot> timeSlots) async {
-    try {
-      final dateKey = DateTime(date.year, date.month, date.day);
-      
-      // Enregistrer dans la base de données
-      await FirebaseFirestore.instance
-          .collection('doctors')
-          .doc(widget.doctorId)
-          .collection('availabilities')
-          .doc(DateFormat('yyyy-MM-dd').format(date))
-          .set(DoctorAvailability(date: date, timeSlots: timeSlots).toMap());
-      
-      // Mettre à jour l'état local
-      setState(() {
-        _availabilityMap[dateKey] = timeSlots;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Disponibilités enregistrées avec succès'))
-      );
-    } catch (e) {
-      print('Erreur lors de l\'enregistrement des disponibilités: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l\'enregistrement des disponibilités'))
-      );
-    }
-  }
-  
-  // Récupère les créneaux horaires pour une date donnée
-  List<TimeSlot> _getTimeSlotsForDay(DateTime date) {
-    final dateKey = DateTime(date.year, date.month, date.day);
+    // Initialisation avec des médecins d'exemple
+    doctors = {
+      'doc1': Doctor(id: 'doc1', name: 'Dr. Martin', specialty: 'Cardiologie', color: Colors.red.shade300),
+      'doc2': Doctor(id: 'doc2', name: 'Dr. Dupont', specialty: 'Pédiatrie', color: Colors.blue.shade300),
+      'doc3': Doctor(id: 'doc3', name: 'Dr. Dubois', specialty: 'Dermatologie', color: Colors.green.shade300),
+      'doc4': Doctor(id: 'doc4', name: 'Dr. Bernard', specialty: 'Neurologie', color: Colors.purple.shade300),
+    };
     
-    if (_availabilityMap.containsKey(dateKey)) {
-      return _availabilityMap[dateKey]!;
-    } else {
-      // Créer des créneaux par défaut s'il n'y en a pas
-      return _defaultTimeSlots.map((time) => 
-        TimeSlot(time: time, isAvailable: false)
-      ).toList();
-    }
+    // Initialisation avec des disponibilités d'exemple
+    final today = DateTime.now();
+    final tomorrow = today.add(const Duration(days: 1));
+    
+    availabilities = {
+      DateTime(today.year, today.month, today.day): [
+        Availability(
+          id: 'avail1', 
+          doctorId: 'doc1', 
+          start: DateTime(today.year, today.month, today.day, 9, 0),
+          end: DateTime(today.year, today.month, today.day, 12, 0),
+        ),
+        Availability(
+          id: 'avail2', 
+          doctorId: 'doc2', 
+          start: DateTime(today.year, today.month, today.day, 14, 0),
+          end: DateTime(today.year, today.month, today.day, 17, 0),
+        ),
+      ],
+      DateTime(tomorrow.year, tomorrow.month, tomorrow.day): [
+        Availability(
+          id: 'avail3', 
+          doctorId: 'doc3', 
+          start: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 10, 0),
+          end: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 15, 0),
+        ),
+        Availability(
+          id: 'avail4', 
+          doctorId: 'doc1', 
+          start: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 16, 0),
+          end: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 18, 0),
+        ),
+      ],
+    };
   }
-  
+
+  List<Availability> _getAvailabilitiesForDay(DateTime day) {
+    final normalizedDay = DateTime(day.year, day.month, day.day);
+    return availabilities[normalizedDay] ?? [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Disponibilités du Docteur', style: TextStyle(fontSize: 18)),
-        backgroundColor: Colors.purple,
+        title: const Text('Disponibilité des Médecins'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {
-              // Enregistrer les disponibilités du jour sélectionné
-              _saveAvailability(_selectedDay, _getTimeSlotsForDay(_selectedDay));
-            },
+            icon: const Icon(Icons.person_add),
+            onPressed: () => _showAddDoctorDialog(),
           ),
         ],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                TableCalendar(
-                  firstDay: DateTime.now().subtract(Duration(days: 1)),
-                  lastDay: DateTime.now().add(Duration(days: 365)),
-                  focusedDay: _focusedDay,
-                  calendarFormat: _calendarFormat,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                      _focusedDay = focusedDay;
-                    });
-                  },
-                  onFormatChanged: (format) {
-                    setState(() {
-                      _calendarFormat = format;
-                    });
-                  },
-                  calendarStyle: CalendarStyle(
-                    todayDecoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.purple,
-                      shape: BoxShape.circle,
-                    ),
-                    weekendTextStyle: TextStyle(color: Colors.red),
-                  ),
-                  headerStyle: HeaderStyle(
-                    formatButtonVisible: true,
-                    titleCentered: true,
-                  ),
-                  calendarBuilders: CalendarBuilders(
-                    markerBuilder: (context, date, events) {
-                      final dateKey = DateTime(date.year, date.month, date.day);
-                      final hasAvailability = _availabilityMap[dateKey]?.any((slot) => slot.isAvailable) ?? false;
-                      
-                      return hasAvailability
-                          ? Positioned(
-                              right: 1,
-                              bottom: 1,
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            )
-                          : Container();
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Disponibilités du ${DateFormat('d MMMM yyyy', 'fr_FR').format(_selectedDay)}',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Inverser toutes les disponibilités du jour
-                          setState(() {
-                            final dateKey = DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-                            final slots = _getTimeSlotsForDay(_selectedDay);
-                            final allAvailable = slots.every((slot) => slot.isAvailable);
-                            
-                            for (var slot in slots) {
-                              slot.isAvailable = !allAvailable;
-                            }
-                            
-                            _availabilityMap[dateKey] = slots;
-                          });
-                        },
-                        child: Text(
-                          'Tout ${_getTimeSlotsForDay(_selectedDay).every((slot) => slot.isAvailable) ? 'désélectionner' : 'sélectionner'}'
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: _buildAvailabilityList(),
-                ),
-              ],
+      body: Column(
+        children: [
+          TableCalendar(
+            firstDay: DateTime.utc(2023, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            eventLoader: (day) {
+              return _getAvailabilitiesForDay(day);
+            },
+            calendarStyle: const CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.deepPurple,
+                shape: BoxShape.circle,
+              ),
             ),
+          ),
+          const SizedBox(height: 8.0),
+          Expanded(
+            child: _buildAvailabilityList(),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          if (_selectedDay != null) {
+            _showAddAvailabilityDialog(_selectedDay!);
+          }
+        },
+      ),
     );
   }
 
   Widget _buildAvailabilityList() {
-    final timeSlots = _getTimeSlotsForDay(_selectedDay);
-    
+    if (_selectedDay == null) {
+      return const Center(child: Text('Sélectionnez une date'));
+    }
+
+    final availabilitiesForDay = _getAvailabilitiesForDay(_selectedDay!);
+
+    if (availabilitiesForDay.isEmpty) {
+      return const Center(child: Text('Aucune disponibilité pour cette date'));
+    }
+
     return ListView.builder(
-      itemCount: timeSlots.length,
+      itemCount: availabilitiesForDay.length,
       itemBuilder: (context, index) {
-        final slot = timeSlots[index];
+        final availability = availabilitiesForDay[index];
+        final doctor = doctors[availability.doctorId];
+        
+        if (doctor == null) return const SizedBox();
         
         return Card(
-          elevation: 2,
-          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: CheckboxListTile(
-            title: Text(slot.time, style: TextStyle(fontSize: 16)),
-            value: slot.isAvailable,
-            onChanged: (value) {
-              setState(() {
-                slot.isAvailable = value ?? false;
-                
-                // Mettre à jour la map
-                final dateKey = DateTime(_selectedDay.year, _selectedDay.month, _selectedDay.day);
-                _availabilityMap[dateKey] = timeSlots;
-              });
-            },
-            activeColor: Colors.purple,
-            checkColor: Colors.white,
-            secondary: Icon(
-              Icons.schedule,
-              color: slot.isAvailable ? Colors.purple : Colors.grey,
+          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: doctor.color,
+              child: Text(doctor.name.substring(0, 1)),
+            ),
+            title: Text(doctor.name),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(doctor.specialty),
+                Text(
+                  '${DateFormat('HH:mm').format(availability.start)} - ${DateFormat('HH:mm').format(availability.end)}',
+                ),
+                if (availability.note.isNotEmpty) Text('Note: ${availability.note}'),
+              ],
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  onPressed: () => _showEditAvailabilityDialog(availability),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _deleteAvailability(availability),
+                ),
+              ],
             ),
           ),
         );
       },
+    );
+  }
+
+  void _showAddDoctorDialog() {
+    final nameController = TextEditingController();
+    final specialtyController = TextEditingController();
+    Color selectedColor = Colors.blue;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ajouter un médecin'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nom'),
+              ),
+              TextField(
+                controller: specialtyController,
+                decoration: const InputDecoration(labelText: 'Spécialité'),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                children: [
+                  Colors.red,
+                  Colors.pink,
+                  Colors.purple,
+                  Colors.deepPurple,
+                  Colors.indigo,
+                  Colors.blue,
+                  Colors.lightBlue,
+                  Colors.cyan,
+                  Colors.teal,
+                  Colors.green,
+                  Colors.lightGreen,
+                  Colors.lime,
+                  Colors.yellow,
+                  Colors.amber,
+                  Colors.orange,
+                  Colors.deepOrange,
+                ].map((color) {
+                  return GestureDetector(
+                    onTap: () {
+                      selectedColor = color;
+                      Navigator.pop(context);
+                      _showAddDoctorDialog();
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: selectedColor == color
+                              ? Colors.black
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty && specialtyController.text.isNotEmpty) {
+                setState(() {
+                  final newId = 'doc${doctors.length + 1}';
+                  doctors[newId] = Doctor(
+                    id: newId,
+                    name: nameController.text,
+                    specialty: specialtyController.text,
+                    color: selectedColor,
+                  );
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Ajouter'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddAvailabilityDialog(DateTime day) {
+    if (doctors.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez d\'abord ajouter un médecin')),
+      );
+      return;
+    }
+
+    String selectedDoctorId = doctors.values.first.id;
+    final startTime = TimeOfDay(hour: 9, minute: 0);
+    final endTime = TimeOfDay(hour: 17, minute: 0);
+    final noteController = TextEditingController();
+
+    _showAvailabilityDialog(
+      title: 'Ajouter une disponibilité',
+      doctorId: selectedDoctorId,
+      start: startTime,
+      end: endTime,
+      noteController: noteController,
+      onSave: (doctorId, start, end, note) {
+        final startDateTime = DateTime(
+          day.year, day.month, day.day, start.hour, start.minute,
+        );
+        final endDateTime = DateTime(
+          day.year, day.month, day.day, end.hour, end.minute,
+        );
+
+        setState(() {
+          final normalizedDay = DateTime(day.year, day.month, day.day);
+          final newAvailability = Availability(
+            id: 'avail${DateTime.now().millisecondsSinceEpoch}',
+            doctorId: doctorId,
+            start: startDateTime,
+            end: endDateTime,
+            note: note,
+          );
+
+          if (availabilities.containsKey(normalizedDay)) {
+            availabilities[normalizedDay]!.add(newAvailability);
+          } else {
+            availabilities[normalizedDay] = [newAvailability];
+          }
+        });
+      },
+    );
+  }
+
+  void _showEditAvailabilityDialog(Availability availability) {
+    final startTime = TimeOfDay(hour: availability.start.hour, minute: availability.start.minute);
+    final endTime = TimeOfDay(hour: availability.end.hour, minute: availability.end.minute);
+    final noteController = TextEditingController(text: availability.note);
+
+    _showAvailabilityDialog(
+      title: 'Modifier la disponibilité',
+      doctorId: availability.doctorId,
+      start: startTime,
+      end: endTime,
+      noteController: noteController,
+      onSave: (doctorId, start, end, note) {
+        final startDateTime = DateTime(
+          availability.start.year,
+          availability.start.month,
+          availability.start.day,
+          start.hour,
+          start.minute,
+        );
+        final endDateTime = DateTime(
+          availability.end.year,
+          availability.end.month,
+          availability.end.day,
+          end.hour,
+          end.minute,
+        );
+
+        setState(() {
+          final normalizedDay = DateTime(
+            availability.start.year,
+            availability.start.month,
+            availability.start.day,
+          );
+          
+          final index = availabilities[normalizedDay]!.indexWhere((a) => a.id == availability.id);
+          
+          if (index != -1) {
+            availabilities[normalizedDay]![index] = Availability(
+              id: availability.id,
+              doctorId: doctorId,
+              start: startDateTime,
+              end: endDateTime,
+              note: note,
+            );
+          }
+        });
+      },
+    );
+  }
+
+  void _showAvailabilityDialog({
+    required String title,
+    required String doctorId,
+    required TimeOfDay start,
+    required TimeOfDay end,
+    required TextEditingController noteController,
+    required Function(String, TimeOfDay, TimeOfDay, String) onSave,
+  }) {
+    String selectedDoctorId = doctorId;
+    TimeOfDay startTime = start;
+    TimeOfDay endTime = end;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text(title),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    value: selectedDoctorId,
+                    items: doctors.values.map((doctor) {
+                      return DropdownMenuItem<String>(
+                        value: doctor.id,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: doctor.color,
+                              radius: 12,
+                              child: Text(doctor.name.substring(0, 1), style: const TextStyle(fontSize: 10, color: Colors.white)),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(doctor.name),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          selectedDoctorId = value;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ListTile(
+                          title: const Text('Début'),
+                          subtitle: Text('${startTime.hour}:${startTime.minute.toString().padLeft(2, '0')}'),
+                          onTap: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: startTime,
+                            );
+                            if (time != null) {
+                              setState(() {
+                                startTime = time;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: ListTile(
+                          title: const Text('Fin'),
+                          subtitle: Text('${endTime.hour}:${endTime.minute.toString().padLeft(2, '0')}'),
+                          onTap: () async {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: endTime,
+                            );
+                            if (time != null) {
+                              setState(() {
+                                endTime = time;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  TextField(
+                    controller: noteController,
+                    decoration: const InputDecoration(labelText: 'Note (optionnelle)'),
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Vérification que l'heure de fin est après l'heure de début
+                  final startMinutes = startTime.hour * 60 + startTime.minute;
+                  final endMinutes = endTime.hour * 60 + endTime.minute;
+                  
+                  if (endMinutes <= startMinutes) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('L\'heure de fin doit être après l\'heure de début')),
+                    );
+                    return;
+                  }
+                  
+                  onSave(selectedDoctorId, startTime, endTime, noteController.text);
+                  Navigator.pop(context);
+                },
+                child: const Text('Enregistrer'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _deleteAvailability(Availability availability) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer la disponibilité'),
+        content: const Text('Êtes-vous sûr de vouloir supprimer cette disponibilité ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                final normalizedDay = DateTime(
+                  availability.start.year,
+                  availability.start.month,
+                  availability.start.day,
+                );
+                
+                availabilities[normalizedDay]!.removeWhere((a) => a.id == availability.id);
+                
+                // Si la liste est vide, on supprime la clé
+                if (availabilities[normalizedDay]!.isEmpty) {
+                  availabilities.remove(normalizedDay);
+                }
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
     );
   }
 }
