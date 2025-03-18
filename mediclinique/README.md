@@ -1,16 +1,44 @@
-# mediclic
+MEDICLINIQUE
+Description
+Mediclinique est une application mobile innovante conçue pour faciliter l'accès aux medecin et au clinique. Elle offre une plateforme centralisée pour :
 
-A new Flutter project.
+Prendre des rendez-vous avec des patients .
+**Consulter le dossier médical des partients en charge en temps reel
+Fonctionnalités principales
+Prise de rendez-vous en ligne :
+Visualisation des disponibilités des médecins et choix d'un créneau horaire.
+Confirmation et rappels de rendez-vous.
+Gestion des rendez-vous (annulation, report).
+Conseils personnalisés basés sur les symptômes et l'historique médical.
+Orientation vers les ressources médicales appropriées.
+Carte interactive pour localiser les cliniques et pharmacies à proximité.
+Informations détaillées sur les établissements (adresse, horaires, contact).
+Liste des spécialistes disponible dans cet hopital
+**Consulter le dossier médical d'un patient
+Voir les consultations passées, les diagnostics et les traitements administrés, le spécialiste en charge.
+Technologies utilisées
+Frontend : Flutter est le langage utilisé pour l'interface utilisateur mobile
+Base de données : [Firebase]
+Géolocalisation : [Geolocator]
+Installation
+Téléchargez l'application depuis [App Store/Google Play Store] ou télécharger le code source.
+Créez un compte ou connectez-vous.
+Autorisez l'application à accéder à votre localisation.
+Utilisation
+Prise de rendez-vous :
+Sélectionnez la spécialité médicale souhaitée.
+Choisissez un médecin et un créneau horaire.
+Géolocalisation :
+Recherchez des spécialiste, des cliniques avec leur noms ou leurs spécialités.
+Obtenez des informations détaillées.
+Contribution
+Les contributions sont les bienvenues ! Pour contribuer, veuillez :
 
-## Getting Started
+Fork le dépôt.
+Créer une branche pour votre fonctionnalité.
+Soumettre une pull request.
+Contact
+fvodounoupke@gmail.com attolouyvette@gmail.com
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Auteur
+Fredi Vodounounoukpe . Attolou Yvette .
