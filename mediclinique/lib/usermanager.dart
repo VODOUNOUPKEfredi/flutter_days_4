@@ -1,7 +1,7 @@
 // user_management_page.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mediclic/services/auth_service.dart';
+import 'package:mediclinique/services/auth_service.dart';
 
 class UserManagementPage extends StatelessWidget {
   final AuthService _authService = AuthService();

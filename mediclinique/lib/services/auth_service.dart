@@ -228,26 +228,38 @@ class AuthService {
   }
 
   // Récupérer le rôle de l'utilisateur depuis Firestore
+  // Future<String?> getUserRole(String uid) async {
+  //   try {
+  //     // Vérifier d'abord dans la collection 'cliniques'
+  //     DocumentSnapshot clinicDoc = await _firestore.collection('cliniques').doc(uid).get();
+  //     if (clinicDoc.exists) {
+  //       return 'clinic';
+  //     }
+      
+  //     // Sinon, vérifier dans la collection 'users'
+  //     DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+  //     if (userDoc.exists) {
+  //       return userDoc['role'] as String?;
+  //     }
+      
+  //     return "Rôle non trouvé";
+  //   } catch (e) {
+  //     print("Erreur lors de la récupération du rôle : $e");
+  //     return "Erreur lors de la récupération du rôle : ${e.toString()}";
+  //   }
+  // }
   Future<String?> getUserRole(String uid) async {
-    try {
-      // Vérifier d'abord dans la collection 'cliniques'
-      DocumentSnapshot clinicDoc = await _firestore.collection('cliniques').doc(uid).get();
-      if (clinicDoc.exists) {
-        return 'clinic';
-      }
-      
-      // Sinon, vérifier dans la collection 'users'
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
-      if (userDoc.exists) {
-        return userDoc['role'] as String?;
-      }
-      
-      return "Rôle non trouvé";
-    } catch (e) {
-      print("Erreur lors de la récupération du rôle : $e");
-      return "Erreur lors de la récupération du rôle : ${e.toString()}";
+  try {
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      return userDoc['role'] as String?;
     }
+    return null;
+  } catch (e) {
+    print("Erreur lors de la récupération du rôle : $e");
+    return null;
   }
+}
 
   // Récupérer les informations de la clinique connectée
   Future<Map<String, dynamic>?> getCliniqueInfo() async {

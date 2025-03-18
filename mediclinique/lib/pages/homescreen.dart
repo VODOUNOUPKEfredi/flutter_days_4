@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mediclic/clinique/pages/CliniqueHomeScreen.dart';
-import 'package:mediclic/clinique/pages/profilClinique.dart';
-import 'package:mediclic/doctor/disponibilitedoctor.dart';
-import 'package:mediclic/doctor/pages/dashboard.dart';
-import 'package:mediclic/doctor/pages/dossier1.dart';
-import 'package:mediclic/doctor/pages/historique.dart';
-import 'package:mediclic/doctor/pages/profil.dart';
-import 'package:mediclic/doctor/pages/rdv.dart';
-import 'package:mediclic/services/auth_service.dart';
+import 'package:mediclinique/clinique/pages/CliniqueHomeScreen.dart';
+import 'package:mediclinique/clinique/pages/profilClinique.dart';
+import 'package:mediclinique/doctor/disponibilitedoctor.dart';
+import 'package:mediclinique/doctor/pages/dashboard.dart';
+import 'package:mediclinique/doctor/pages/dossier1.dart';
+import 'package:mediclinique/doctor/pages/historique.dart';
+import 'package:mediclinique/doctor/pages/profil.dart';
+import 'package:mediclinique/doctor/pages/rdv.dart';
+import 'package:mediclinique/services/auth_service.dart';
 
 // Imports pour les pages médecin
 
@@ -41,7 +41,7 @@ class _HomeContainerState extends State<HomeContainer> {
       _widgetOptions = [
         DoctorHomePage(),
         HistoriquePage(),
-        RdvPage(),
+        ConsultationsPage(),
         DossierMedicalForm(),
         AvailabilityCalendar(doctorId: '',),
         DoctorProfilePage(),

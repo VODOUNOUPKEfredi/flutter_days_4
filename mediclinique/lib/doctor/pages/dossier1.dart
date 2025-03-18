@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mediclic/services/medicalrecordService.dart';
+import 'package:mediclinique/services/medicalrecordService.dart';
 
 class DossierMedicalForm extends StatefulWidget {
   @override

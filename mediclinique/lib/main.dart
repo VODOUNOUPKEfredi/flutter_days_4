@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:mediclic/clinique/pages/CliniqueHomeScreen.dart';
-import 'package:mediclic/doctor/pages/dashboard.dart';
-import 'package:mediclic/pages/homescreen.dart';
-import 'package:mediclic/pages/register_page.dart';
-import 'package:mediclic/pages/login_page.dart';
-import 'package:mediclic/services/auth_service.dart';
+import 'package:mediclinique/clinique/pages/CliniqueHomeScreen.dart';
+import 'package:mediclinique/doctor/pages/dashboard.dart';
+import 'package:mediclinique/pages/homescreen.dart';
+import 'package:mediclinique/pages/register_page.dart';
+import 'package:mediclinique/pages/login_page.dart';
+import 'package:mediclinique/services/auth_service.dart';
 import 'firebase_options.dart';
 
 void main() async {

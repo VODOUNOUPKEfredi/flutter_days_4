@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mediclic/pages/userDoctor.dart';
-import 'package:mediclic/services/auth_service.dart';
+import 'package:mediclinique/pages/userDoctor.dart';
+import 'package:mediclinique/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Cliniquehomescreen extends StatefulWidget {

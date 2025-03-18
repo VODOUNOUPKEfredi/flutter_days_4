@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mediclic/main.dart';
-import 'package:mediclic/doctor/pages/dossier1.dart';
+import 'package:mediclinique/main.dart';
+import 'package:mediclinique/doctor/pages/dossier1.dart';
 void main() async {
   
   
