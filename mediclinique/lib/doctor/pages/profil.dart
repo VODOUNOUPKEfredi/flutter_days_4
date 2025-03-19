@@ -75,7 +75,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           Map<String, dynamic> data = doctorDoc.data() as Map<String, dynamic>;
           
           setState(() {
-            _name = data['name'] ?? 'Dr. ' + (user.displayName ?? 'Inconnu');
+            _name = data['name'] ?? '' + (user.displayName ?? 'Inconnu');
             _speciality = data['speciality'] ?? 'Non spécifié';
             _phone = data['phone'] ?? 'Non spécifié';
             _address = data['address'] ?? 'Non spécifié';
@@ -89,7 +89,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             _experienceYears = data['experienceYears'] ?? 0;
             
             // Initialiser les contrôleurs pour l'édition
-            _nameController.text = _name?.replaceFirst('Dr. ', '') ?? '';
+            _nameController.text = _name?.replaceFirst('', '') ?? '';
             _phoneController.text = _phone ?? '';
             _bioController.text = _bio ?? '';
             _specialityController.text = _speciality ?? '';
@@ -99,14 +99,14 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           // Créer un document pour le médecin s'il n'existe pas
           String displayName = user.displayName ?? 'Nouveau Médecin';
           await _firestore.collection('doctors').doc(user.uid).set({
-            'name': 'Dr. ' + displayName,
+            'name': ' ' + displayName,
             'email': user.email,
             'photoUrl': user.photoURL,
             'createdAt': FieldValue.serverTimestamp(),
           });
           
           setState(() {
-            _name = 'Dr. ' + displayName;
+            _name = ' ' + displayName;
           });
         }
       }
@@ -143,7 +143,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
         if (user != null) {
           // Mettre à jour le profil dans Firestore
           await _firestore.collection('doctors').doc(user.uid).update({
-            'name': 'Dr. ' + _nameController.text.trim(),
+            'name': ' ' + _nameController.text.trim(),
             'speciality': _specialityController.text.trim(),
             'phone': _phoneController.text.trim(),
             'address': _addressController.text.trim(),
