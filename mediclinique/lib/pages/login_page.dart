@@ -133,63 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Future<void> _login() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //     _errorMessage = null; // Reset error message
-  //   });
-
-  //   final email = _emailController.text.trim();
-  //   final password = _passwordController.text.trim();
-
-  //   try {
-  //     // Connexion avec l'email et le mot de passe
-  //     String? loginError = await _authService.loginUser(email, password);
-  //     if (loginError != null) {
-  //       setState(() {
-  //         _errorMessage = loginError;
-  //       });
-  //       return;
-  //     }
-
-  //     // Récupérer l'ID de l'utilisateur connecté
-  //     String? userId = _authService.getCurrentUserId();
-  //     if (userId != null) {
-  //       // Vérifier le rôle de l'utilisateur
-  //       String? role = await _authService.getUserRole(userId);
-  //       if (role == 'admin') {
-  //         Navigator.pushReplacementNamed(context, '/home'); // Redirige vers la page d'accueil admin
-  //       } else if (role == 'clinic') {
-  //         bool isClinic = await _authService.isClinic();
-  //         if (isClinic) {
-  //           Navigator.pushReplacementNamed(context, '/clinique_home'); // Page de la clinique
-  //         } else {
-  //           setState(() {
-  //             _errorMessage = 'Utilisateur non autorisé pour ce rôle.';
-  //           });
-  //         }
-  //       } else if (role == 'medecin') {
-  //         Navigator.pushReplacementNamed(context, '/doctor_home'); // Page du médecin
-  //       } else {
-  //         setState(() {
-  //           _errorMessage = 'Rôle utilisateur inconnu.';
-  //         });
-  //       }
-  //     } else {
-  //       setState(() {
-  //         _errorMessage = 'Impossible de récupérer l\'ID de l\'utilisateur.';
-  //       });
-  //     }
-  //   } on FirebaseAuthException catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.message;
-  //     });
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
+  
   Future<void> _login() async {
   setState(() {
     _isLoading = true;
@@ -211,22 +155,25 @@ class _LoginScreenState extends State<LoginScreen> {
     String? userId = _authService.getCurrentUserId();
     if (userId != null) {
       String? role = await _authService.getUserRole(userId);
-      
-      switch(role) {
-        case 'admin':
-          Navigator.pushReplacementNamed(context, '/admin_home');
-          break;
-        case 'medecin':
-          Navigator.pushReplacementNamed(context, '/medecin_home');
-          break;
-        case 'patient':
-          Navigator.pushReplacementNamed(context, '/patient_home');
-          break;
-        default:
-          setState(() {
-            _errorMessage = 'Rôle utilisateur non reconnu: $role';
-          });
-      }
+      print("$role");
+     switch(role) {
+  // case 'admin':
+  //   Navigator.pushReplacementNamed(context, '/admin_home');
+  //   break;
+  case 'clinic':
+    Navigator.pushReplacementNamed(context, '/clinique_home');
+    break;
+  case 'medecin':
+    Navigator.pushReplacementNamed(context, '/medecin_home');
+    break;
+  // case 'patient':
+  //   Navigator.pushReplacementNamed(context, '/patient_home');
+  //   break;
+  default:
+    setState(() {
+      _errorMessage = 'Rôle utilisateur non reconnu: $role';
+    });
+}
     } else {
       setState(() {
         _errorMessage = 'Impossible de récupérer l\'ID de l\'utilisateur';
